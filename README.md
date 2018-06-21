@@ -1,3 +1,4 @@
+# Sonoff Control Server Alexa Skill
 Simple smart-home Alexa skill to control switch devices, using the [Sonoff Control Server](https://github.com/liorcode/sonoff-control-server).
 
 Designed to be used as an AWS Lambda function, and therefore includes only two small scripts.

@@ -21,9 +21,9 @@ export type AlexaErrorResponseType = 'ALREADY_IN_OPERATION'
 export interface AlexaHeader {
   namespace: string;
   name: string;
-  payloadVersion: '3'; // only 3 is supported here
+  payloadVersion: string; // only 3 is supported here
   messageId: string;
-  correlationToken: string;
+  correlationToken?: string;
 }
 
 export interface AlexaScopeObject {

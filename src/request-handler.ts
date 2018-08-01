@@ -18,7 +18,6 @@ export class AlexaRequestsHandler {
   header: Alexa.AlexaHeader;
   endpoint: Alexa.AlexaEndpoint;
   payload: Alexa.AlexaPayload;
-  correlationToken: string;
   endpointApi = new SonoffApi();
 
   handleDirective(directive: Alexa.AlexaDirective) {
@@ -52,13 +51,16 @@ export class AlexaRequestsHandler {
    * @return {AlexaHeader}
    */
   generateResponseHeader(namespace: string, name: string): Alexa.AlexaHeader {
-    return {
+    const response = <Alexa.AlexaHeader>{
       namespace,
       name,
       payloadVersion: '3',
-      messageId: generateMessageID(),
-      correlationToken: this.correlationToken,
+      messageId: generateMessageID()
+    };
+    if (this.header.correlationToken) { // if a correlation token was used, add it to response
+      response.correlationToken = this.header.correlationToken;
     }
+    return response;
   }
 
   /**
@@ -68,15 +70,20 @@ export class AlexaRequestsHandler {
    * @return {AlexaErrorResponse}
    */
   generateErrorResponse(errorType: Alexa.AlexaErrorResponseType, message?: string): Alexa.AlexaErrorResponse {
-    return {
-      event: {
-        header: this.generateResponseHeader('Alexa', 'ErrorResponse'),
-        endpoint: { endpointId: this.endpoint.endpointId },
-        payload: {
-          type: errorType,
-          message,
-        }
+    const event = <Alexa.AlexaErrorEvent>{
+      header: this.generateResponseHeader('Alexa', 'ErrorResponse'),
+      payload: {
+        type: errorType,
+        message,
       }
+    };
+
+    if (this.endpoint) {
+      event.endpoint = { endpointId: this.endpoint.endpointId };
+    }
+
+    return {
+      event
     }
   }
 
@@ -107,11 +114,10 @@ export class AlexaRequestsHandler {
     try {
       const deviceStatus = await this.endpointApi.getDeviceStatus(token, this.endpoint.endpointId);
 
-      return {
+      const report = {
         context: {
           properties: [
-            this.generateReportProperty('Alexa.EndpointHealth', 'connectivity', deviceStatus.connectivity),
-            this.generateReportProperty('Alexa.PowerController', 'powerState', deviceStatus.switchStatus),
+            this.generateReportProperty('Alexa.EndpointHealth', 'connectivity', { value: deviceStatus.connectivity }),
           ]
         },
         event: {
@@ -119,8 +125,19 @@ export class AlexaRequestsHandler {
           endpoint: { endpointId: this.endpoint.endpointId },
           payload: {}
         }
+      };
+
+      if (deviceStatus.connectivity === 'OK') { // if bridge is connected, add switch status
+        report.context.properties.push(this.generateReportProperty(
+          'Alexa.PowerController',
+          'powerState',
+          deviceStatus.switchStatus
+        ));
       }
+
+      return report;
     } catch (err) {
+      console.error('State report error', err);
       switch (err.statusCode) {
         case 401:
           return this.generateAuthError(err);
@@ -149,12 +166,16 @@ export class AlexaRequestsHandler {
         }
       }
     } catch (err) {
-      switch (err.statusCode) {
-        case 401:
-          return this.generateAuthError(err);
-        default:
-          return this.generateErrorResponse('BRIDGE_UNREACHABLE', 'Unable to get devices');
-      }
+      console.error('Discovery error', err);
+
+      // If any error happens, discovery should return an empty endpoints list (and never an error)
+      return {
+        event: {
+          header: this.generateResponseHeader('Alexa.Discovery', 'Discover.Response'),
+          payload: { endpoints: [] }
+        }
+      };
+
     }
   }
 

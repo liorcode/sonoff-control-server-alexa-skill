@@ -10,7 +10,7 @@ type HandlerCallback = (err: Error, resp?: AlexaResponse) => void;
 
 export const handler = (request: AlexaRequest, context: any, callback: HandlerCallback) => {
   const handler = new AlexaRequestsHandler();
-  handler.handleDirective(request.directive)
+  return handler.handleDirective(request.directive)
     .then((resp) => {
       callback(null, resp);
     }).catch((errorMessage) => {

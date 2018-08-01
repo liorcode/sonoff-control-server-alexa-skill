@@ -1,4 +1,4 @@
-const rp = require('../request-promise-lite');
+const rp = require('../lib/request-promise-lite.js');
 const SERVER_URL = process.env.DEVICES_SERVER_URL;
 
 import { IEndpointApi } from './IEndpointApi';
@@ -31,7 +31,7 @@ export class SonoffApi implements IEndpointApi {
         Authorization: `Bearer ${token}`
       }
     }).then((device: ISonoffSwitch) => ({
-      connectivity: device.isOnline ? 'OK' : 'ENDPOINT_UNREACHABLE',
+      connectivity: device.isOnline ? 'OK' : 'UNREACHABLE',
       switchStatus: <'ON' | 'OFF'>device.state.switch.toUpperCase()
     }));
   }

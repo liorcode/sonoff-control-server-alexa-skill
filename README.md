@@ -23,3 +23,9 @@ After making any modifications, you can re-create the dist file by:
 This will create a minified version. If you prefer a non-minified, run:
   
 `yarn build:dev`
+
+### Testing
+
+API Testing is performed using Jest by running:
+
+`yarn test`

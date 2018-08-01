@@ -1,0 +1,48 @@
+[
+  {
+    "state": {
+      "switch": "on",
+      "startup": "on",
+      "timers": [
+        {
+          "do": {
+            "switch": "off"
+          },
+          "enabled": true,
+          "at": "2018-06-18T17:32:00.000Z",
+          "type": "once",
+          "id": "5b1983328bd0b90ee8d55c48"
+        }
+      ],
+      "rssi": "-40"
+    },
+    "id": "10001f97ea",
+    "name": "device 1",
+    "model": "ITA-GZ1-GL",
+    "version": "1.5.5",
+    "isOnline": false
+  },
+  {
+    "state": {
+      "switch": "on",
+      "startup": "on",
+      "timers": [
+        {
+          "do": {
+            "switch": "off"
+          },
+          "enabled": true,
+          "at": "2018-06-18T17:32:00.000Z",
+          "type": "once",
+          "id": "5b1983328bd0b90ee8d55c48"
+        }
+      ],
+      "rssi": "-40"
+    },
+    "id": "10001f97eb",
+    "name": "device 2",
+    "model": "ITA-GZ1-GL",
+    "version": "1.5.5",
+    "isOnline": true
+  }
+]

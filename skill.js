@@ -210,7 +210,7 @@ function handleControl(request) {
      * their devices, accounts, and environment
      *  https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/smart-home-skill-api-reference#error-messages
      */
-    isDeviceOnline(applianceId, userAccessToken).then((status) => {
+    return isDeviceOnline(applianceId, userAccessToken).then((status) => {
       if (!status) {
         log('ERROR', `Device offline: ${applianceId}`);
         return Promise.resolve(generateResponse(
